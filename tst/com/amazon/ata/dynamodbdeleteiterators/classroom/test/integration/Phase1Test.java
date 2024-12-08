@@ -17,7 +17,7 @@ public class Phase1Test {
     private GetMemberActivity getMemberActivity;
 
     @BeforeEach
-    private void setup() {
+     void setup() {
         deleteMemberActivity = ActivityProvider.provideDeleteMemberActivity();
         createMemberActivity = ActivityProvider.provideCreateMemberActivity();
         getMemberActivity = ActivityProvider.provideGetMemberActivity();

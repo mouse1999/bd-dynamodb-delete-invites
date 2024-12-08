@@ -2,14 +2,15 @@ package com.amazon.ata.dynamodbdeleteiterators.classroom.dao;
 
 import com.amazon.ata.dynamodbdeleteiterators.classroom.dao.models.Invite;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
+import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import com.google.common.collect.ImmutableMap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import javax.inject.Inject;
 
 /**
@@ -88,6 +89,26 @@ public class InviteDao {
      *         invite isAttending is set to true.
      */
     public boolean deleteInvite(String eventId, String memberId) {
-        return false;
+        Invite invite = new Invite();
+        invite.setEventId(eventId);
+        invite.setMemberId(memberId);
+
+        DynamoDBDeleteExpression dynamoDBDeleteExpression = new DynamoDBDeleteExpression();
+
+        Map<String, ExpectedAttributeValue> expected = new HashMap<>();
+
+        expected.put("isAttending", new ExpectedAttributeValue(new AttributeValue().withBOOL(false)));
+        dynamoDBDeleteExpression.setExpected(expected);
+
+        try {
+            mapper.delete(invite, dynamoDBDeleteExpression);
+            return true;
+
+        } catch (ConditionalCheckFailedException e) {
+
+            System.out.println(e.getMessage());
+            return false;
+
+        }
     }
 }
